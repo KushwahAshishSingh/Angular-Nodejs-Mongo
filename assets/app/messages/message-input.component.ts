@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {MessageService} from "./message.service";
 import {Message} from "./message.model";
 import {NgForm} from "@angular/forms";
@@ -9,25 +9,38 @@ import {NgForm} from "@angular/forms";
     templateUrl: './message-input.component.html'
 })
 
-export class MessageInputComponent{
-    constructor(private messageService: MessageService) {
+export class MessageInputComponent implements OnInit {
+    message: Message;
+    constructor(private messageService: MessageService) {}
 
-    }
     OnSubmit(form: NgForm) {
-       // console.log(form);
-        const message = new Message(form.value.content, 'ashish');
-       this.messageService.addMessage(message)
-           .subscribe(
-               data => console.log(data),
-               error => console.error(error)
-           );
-       form.resetForm();
+        if (this.message) {
+            this.message.content = form.value.content;
+            this.messageService.updateMessage(this.message)
+                .subscribe(
+                    result => console.log(result)
+                );
+            this.message = null;
+        } else {
+            //create
+            const message = new Message(form.value.content, 'ashish');
+            this.messageService.addMessage(message)
+                .subscribe(
+                    data => console.log(data),
+                    error => console.error(error)
+                );
+        }
+        form.resetForm();
+    }
 
-        //console.log(value);
-        // <input type="text" id="content" class="form-control" #TempinputDataStorage>
-        // <button class="btn btn-primary" type="submit" (click)="onSave(TempinputDataStorage.value)">Save</button>
-        // using   #TempInputDataStorage  in html..  will holds the value and using (click) = "onSave(TempInputDataStorage.value) will transfer the value
-        // to this above >>..  onSave function    and u can see the values written on txt field after click on save button in "console"
+    onClear(form: NgForm) {
+    this.message = null;
+    form.resetForm();
+    }
 
+    ngOnInit(){
+    this.messageService.messageIsEdit.subscribe(
+        (message: Message) => this.message = message
+    );
     }
 }

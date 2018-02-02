@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import { Message } from "./message.model";
 import {MessageService} from "./message.service";
 
@@ -30,21 +30,22 @@ import {MessageService} from "./message.service";
 })
 export class MessageComponent{
     @Input() message: Message;
-    @Output() eidtClicked = new EventEmitter<string>();
-
     color= 'Orange';
 
    constructor(private messageService: MessageService){
 
    }
     onEdit() {
-        // alert('not working for now');
-        //this.eidtClicked.emit('reset');
-        this.eidtClicked.emit('a new value');
+
+
+        this.messageService.editMessage(this.message);
     }
 
     onDelete(){
-       this.messageService.deleteMessage(this.message);
+       this.messageService.deleteMessage(this.message)
+           .subscribe(
+               result => console.log(result)
+           );
 
     }
 
